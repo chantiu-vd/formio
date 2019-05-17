@@ -376,7 +376,34 @@ module.exports = function(formio, items, done) {
 
       let template = {};
       try {
-        template = JSON.parse(fs.readFileSync(projectJson));
+        const sourceTemplate = JSON.parse(fs.readFileSync(projectJson));
+        const {forms: rawForms, resources: rawRes, ...others} = sourceTemplate;
+        const allowedPerms = [
+          'create_own',
+          'create_all',
+          'read_own',
+          'read_all',
+          'update_own',
+          'update_all',
+          'delete_own',
+          'delete_all'
+        ];
+        template = {
+          ...others,
+          forms: _.mapValues(rawForms, (curform) => ({
+            ...curform,
+            access: curform.access.filter(role => _.includes(
+              allowedPerms, role.type)),
+            submissionAccess: curform.submissionAccess.filter(role => _.includes(
+              allowedPerms, role.type)),
+          })),
+          resources: _.mapValues(rawRes, (curRes) => ({
+            ...curRes,
+            access: curRes.access.filter(role => _.includes(allowedPerms, role.type)),
+            submissionAccess: curRes.submissionAccess.filter(role => _.includes(
+              allowedPerms, role.type)),
+          }))
+        };
       }
       catch (err) {
         debug(err);
