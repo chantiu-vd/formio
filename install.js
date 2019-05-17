@@ -414,6 +414,24 @@ module.exports = function(formio, items, done) {
       util.log('Creating root user account...'.green);
       prompt.get([
         {
+          name: 'clinicCode',
+          description: 'Enter Clinic Code for the root account.',
+          require: true,
+          hidden: false
+        },
+        {
+          name: 'username',
+          description: 'Enter Username: ',
+          require: true,
+          hidden: false
+        },
+        {
+          name: 'fullName',
+          description: 'Enter Full Name:',
+          require: true,
+          hidden: false
+        },
+        {
           name: 'email',
           description: 'Enter your email address for the root account.',
           pattern: /^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/,
@@ -440,9 +458,12 @@ module.exports = function(formio, items, done) {
           // Create the root user submission.
           util.log('Creating root user account');
           formio.resources.submission.model.create({
-            form: project.resources.admin._id,
+            form: project.resources.user._id,
             data: {
-              email: result.email,
+              clinicCode: result.clinicCode,
+              username: result.username,
+              fullName : result.fullName,
+              email : result.email,
               password: hash
             },
             roles: [
